@@ -1,6 +1,6 @@
 # Broco Proxy
 
-![](https://i.imgur.com/bwoP01W.jpg)
+![](https://i.imgur.com/OP1r3fH.jpg)
 # How to run
 ```
 broco-proxy --config=config.yaml
