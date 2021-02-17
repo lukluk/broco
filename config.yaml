@@ -13,11 +13,10 @@ statsd_host: http://localhost:8125
 upstreams:
   /v1/test:
     host: "http://localhost:3000"
-    success_condition:
-      http_status: 200
+    add_error_conditions:
       response_body:
         path: status
-        value: 00
+        value: 11
   /v2:
     host: "http://localhost:3000"
     circuit_breaker_key:

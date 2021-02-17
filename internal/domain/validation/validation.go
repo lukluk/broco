@@ -28,7 +28,7 @@ func (v *validation) ValidateExtraErrorByResponse(upstreamId string, body []byte
 	if err != nil {
 		return false
 	}
-	for _, cond := range backend.ExtraErrorConditions {
+	for _, cond := range backend.AddErrorConditions {
 		httpPayloadMatch := false
 
 		jsonValue, ok := jsonParsed.Path(cond.ResponseBody.Path).Data().(string)

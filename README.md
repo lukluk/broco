@@ -29,7 +29,7 @@ http_status (default 503)
 ### upstreams
 #### host
 upstream host
-#### extra_error_conditions
+#### add_error_conditions
 
 response_body : path, value
 
@@ -57,7 +57,7 @@ statsd_host: http://localhost:8125
 upstreams:
   /v1/foo:
     host: http://foo:3000
-    extra_error_conditions:      
+    add_error_conditions:      
       - response_body:
           path: error.code
           value: 111
