@@ -9,6 +9,9 @@ broco-proxy --config=config.yaml
 # Config
 ## port
 Proxy server port (default 8080)
+
+---
+
 ## circuit_breaker
 configuration for circuit breaker logic
 ### thresholds
@@ -26,7 +29,9 @@ closed_duration (default 15m)
 #### fallback
 http_status (default 503)
 
-### upstreams
+---
+
+### Upstreams
 #### host
 upstream host
 #### add_error_conditions
