@@ -4,8 +4,11 @@ circuit_breaker:
     max_error_percentage: 70
     min_success_percentage: 90
   durations:
-    state_interval: 1m
+    state_interval: 10s
     closed_duration: 1m
+  fallback:
+    http_status: 200
+    message: {"status":"11"}
 statsd_host: http://localhost:8125
 upstreams:
   /v1/test:
