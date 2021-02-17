@@ -19,7 +19,7 @@ func NewValidation(cfg config.Config) *validation {
 	}
 }
 
-func (v *validation) ValidateExtraErrorByResponse(upstreamId string, body []byte) bool {
+func (v *validation) ValidateAdditionalErrorsFromResponse(upstreamId string, body []byte) bool {
 	backend, err := v.cfg.GetUpstreamById(upstreamId)
 	if err != nil {
 		return false
