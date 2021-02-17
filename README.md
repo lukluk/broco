@@ -39,7 +39,7 @@ upstream host
 
 response_body : path, value
 
-> example: path: data.status, value: 00
+> example: path: data.status, value: 111
 
 #### circuit_breaker_key
 request_body_json_paths
