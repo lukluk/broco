@@ -7,6 +7,7 @@ broco-proxy --config=config.yaml
 ```
 
 # Config
+
 ## port
 Proxy server port (default 8080)
 
@@ -19,7 +20,7 @@ max_error_percentage (default 70)
 
 min_error_percentage (default 10)
 
-#### durations
+### durations
 state_interval (default 1m)
 
 > timer for circuit breaker take action based on thresholds
