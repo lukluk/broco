@@ -27,7 +27,7 @@ state_interval (default 1m)
 
 closed_duration (default 15m)
 
-#### fallback
+### fallback
 http_status (default 503)
 
 ---
