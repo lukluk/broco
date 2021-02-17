@@ -1,0 +1,22 @@
+port: 8080
+circuit_breaker:
+  thresholds:
+    max_error_percentage: 70
+    min_success_percentage: 90
+  durations:
+    state_interval: 1m
+    closed_duration: 1m
+statsd_host: http://localhost:8125
+upstreams:
+  /v1/test:
+    host: "http://localhost:3000"
+    success_condition:
+      http_status: 200
+      response_body:
+        path: status
+        value: 00
+  /v2:
+    host: "http://localhost:3000"
+    circuit_breaker_key:
+      request_body_json_paths:
+        - bank
