@@ -1,8 +1,9 @@
-![](https://i.ibb.co/pdBV8zF/logo.jpg)
+# Broco Proxy
 
+![](https://i.ibb.co/71HDw1b/2021-02-18-03-08-03.jpg)
 # How to run
 ```
-link-proxy --config=config.yaml
+broco-proxy --config=config.yaml
 ```
 
 # Config
@@ -13,7 +14,7 @@ configuration for circuit breaker logic
 ### thresholds
 max_error_percentage (default 70)
 
-min_success_percentage (default 90)
+min_error_percentage (default 10)
 
 #### durations
 state_interval (default 1m)
@@ -28,10 +29,7 @@ http_status (default 503)
 ### upstreams
 #### host
 upstream host
-#### success_condition
-http_status
-
-> example: 200
+#### extra_error_conditions
 
 response_body : path, value
 
@@ -59,11 +57,13 @@ statsd_host: http://localhost:8125
 upstreams:
   /v1/foo:
     host: http://foo:3000
-    success_condition:
-      http_status: 200
-      response_body:
-        path: status
-        value: 00
+    extra_error_conditions:      
+      - response_body:
+          path: error.code
+          value: 111
+      - response_body:
+          path: error.code
+          value: 222
   /v1/bar:
     host: http://bar:3000
     circuit_breaker_key:
