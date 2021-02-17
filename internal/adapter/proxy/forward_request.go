@@ -1,14 +1,19 @@
 package proxy
 
 import (
+	"github.com/gojektech/heimdall/v6/httpclient"
 	"github.com/lukluk/link-proxy/internal/errors"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"time"
 )
 
 func ForwardRequest (host string, req *http.Request) (*http.Response, error) {
 	url := req.URL
-
+	timeout := 15 * time.Second
+	client := httpclient.NewClient(
+		httpclient.WithHTTPTimeout(timeout),
+		)
 	proxyReq, err := http.NewRequest(req.Method, host + url.RequestURI(), req.Body)
 	if err != nil {
 		log.Error().Msgf("cannot create request to upstream, error:%v", err)
@@ -24,7 +29,6 @@ func ForwardRequest (host string, req *http.Request) (*http.Response, error) {
 		}
 	}
 
-	client := &http.Client{}
 	return client.Do(proxyReq)
 
 }
