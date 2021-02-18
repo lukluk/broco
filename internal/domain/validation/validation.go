@@ -3,6 +3,7 @@ package validation
 import (
 	"github.com/Jeffail/gabs/v2"
 	"github.com/lukluk/link-proxy/config"
+	"github.com/lukluk/link-proxy/config/upstream"
 )
 
 type IValidation interface {
@@ -20,8 +21,8 @@ func NewValidation(cfg config.Config) *validation {
 }
 
 func (v *validation) ValidateAdditionalErrorsFromResponse(upstreamId string, body []byte) bool {
-	backend, err := v.cfg.GetUpstreamById(upstreamId)
-	if err != nil {
+	backend := v.getUpstreamById(upstreamId)
+	if backend.Host == "" {
 		return false
 	}
 	jsonParsed, err := gabs.ParseJSON(body)
@@ -43,4 +44,11 @@ func (v *validation) ValidateAdditionalErrorsFromResponse(upstreamId string, bod
 	}
 	return false
 
+}
+
+func (v *validation) getUpstreamById(id string) upstream.Upstream {
+	if val, ok := v.cfg.Upstreams[id]; ok {
+		return val
+	}
+	return upstream.Upstream{}
 }

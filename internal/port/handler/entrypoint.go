@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/lukluk/link-proxy/config"
 	"github.com/lukluk/link-proxy/config/circuitbreaker"
+	"github.com/lukluk/link-proxy/config/upstream"
 	"github.com/lukluk/link-proxy/internal/adapter/proxy"
 	"github.com/lukluk/link-proxy/internal/adapter/storage/inmemory"
 	"github.com/lukluk/link-proxy/internal/adapter/storage/inmemory/scheme"
@@ -10,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type entryPoint struct {
@@ -33,8 +35,8 @@ func (e *entryPoint) Handler() {
 }
 
 func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
-	backend, backendId, err := e.config.FindUpstreamsByPathURL(r.URL.EscapedPath())
-	if err != nil {
+	backend, backendId := findUpstreamsByPathURL(r.URL.EscapedPath(), e.config.Upstreams)
+	if backendId == "" {
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -96,4 +98,13 @@ func copyHeader(w http.ResponseWriter, sourceHeader http.Header) {
 func fallback(w http.ResponseWriter, fb circuitbreaker.Fallback) {
 	w.WriteHeader(fb.HttpStatus)
 	return
+}
+
+func findUpstreamsByPathURL(path string, upstreamMap map[string]upstream.Upstream) (upstream.Upstream, string) {
+	for key, val := range upstreamMap {
+		if strings.Contains(path, key) {
+			return val, key
+		}
+	}
+	return upstream.Upstream{}, ""
 }
