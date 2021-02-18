@@ -55,26 +55,23 @@ circuit_breaker:
     max_error_percentage: 70
     min_success_percentage: 90
   durations:
-    state_interval: 1m
+    state_interval: 10s
     closed_duration: 1m
   fallback:
-    http_status: 503    
+    http_status: 200
+    message: {"status":"11"}
 statsd_host: http://localhost:8125
 upstreams:
-  /v1/foo:
-    host: http://foo:3000
-    add_error_conditions:      
-      - response_body:
-          path: error.code
-          value: 111
-      - response_body:
-          path: error.code
-          value: 222
-  /v1/bar:
-    host: http://bar:3000
+  /v1/test:
+    host: "http://localhost:3000"
+    add_error_conditions:
+      response_body:
+        path: status
+        value: 11
+  /v2:
+    host: "http://localhost:3000"
     circuit_breaker_key:
       request_body_json_paths:
         - bank
-
 ```
 
