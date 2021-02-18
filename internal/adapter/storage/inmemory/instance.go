@@ -19,9 +19,6 @@ func (i *CircuitBreakerData) Get(key string) *scheme.Instance {
 	}
 	return i.instances[key]
 }
-func (i *CircuitBreakerData) IncSuccessCount(key string) {
-	i.instances[key].Stats.IncSuccessCount()
-}
 
 func (i *CircuitBreakerData) IncErrorCount(key string) {
 	i.instances[key].Stats.ErrorCount()

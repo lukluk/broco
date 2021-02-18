@@ -7,7 +7,7 @@ import (
 )
 
 type IValidation interface {
-	ValidateErrorResponse(upstreamId string, body []byte) bool
+	ValidateAdditionalErrorsFromResponse(upstreamId string, body []byte) bool
 }
 
 type validation struct {

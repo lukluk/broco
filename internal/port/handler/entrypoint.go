@@ -63,7 +63,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e *entryPoint) updateStat(backendId string, instance *scheme.Instance, respBody []byte, statusCode int) {
-	if statusCode >= 500 ||  e.validation.ValidateErrorResponse(backendId, respBody) {
+	if statusCode >= 500 ||  e.validation.ValidateAdditionalErrorsFromResponse(backendId, respBody) {
 		instance.Stats.IncErrorCount()
 	}
 }
