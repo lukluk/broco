@@ -2,7 +2,7 @@ port: 8080
 circuit_breaker:
   thresholds:
     max_error_percentage: 70
-    min_success_percentage: 90
+    min_error_percentage: 10
   durations:
     state_interval: 10s
     closed_duration: 1m
