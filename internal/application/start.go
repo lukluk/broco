@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func StartLinkProxy()  {
+func StartProxy()  {
 	configPath := flag.String("config", "config.yaml", "config path")
 	flag.Parse()
 	log.Debug().Msgf("using config file : %s", *configPath)
