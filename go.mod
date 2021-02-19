@@ -3,6 +3,7 @@ module github.com/lukluk/link-proxy
 go 1.15
 
 require (
+	github.com/DataDog/datadog-go v3.7.1+incompatible
 	github.com/Jeffail/gabs/v2 v2.6.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gojektech/heimdall/v6 v6.1.0
