@@ -23,7 +23,7 @@ func StartLinkProxy()  {
 	go func() {
 		cb.RunScheduler()
 	}()
-	handler.NewEntryPoint(cfg, circuitBreakerData, v).Handler()
+	handler.NewEntryPoint(cfg, circuitBreakerData, v, statsdClient).Handler()
 	HTTPServer(cfg)
 
 }

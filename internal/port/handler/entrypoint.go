@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/DataDog/datadog-go/statsd"
 	"github.com/lukluk/link-proxy/config"
 	"github.com/lukluk/link-proxy/config/circuitbreaker"
 	"github.com/lukluk/link-proxy/config/upstream"
@@ -11,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -18,14 +20,17 @@ type entryPoint struct {
 	config config.Config
 	circuitBreakerData *inmemory.CircuitBreakerData
 	validation validation.IValidation
+	statsdClient *statsd.Client
 }
 func NewEntryPoint(cfg config.Config,
 	circuitBreakerData *inmemory.CircuitBreakerData,
-	iValidation validation.IValidation) *entryPoint {
+	iValidation validation.IValidation,
+	statsdClient *statsd.Client) *entryPoint {
 	return &entryPoint{
 		cfg,
 		circuitBreakerData,
 		iValidation,
+		statsdClient,
 	}
 }
 func (e *entryPoint) Handler() {
@@ -35,15 +40,19 @@ func (e *entryPoint) Handler() {
 }
 
 func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
-	backend, backendId := findUpstreamsByPathURL(r.URL.EscapedPath(), e.config.Upstreams)
+	backend, backendId := findUpstreamByPathURL(r.URL.EscapedPath(), e.config.Upstreams)
 	if backendId == "" {
 		w.WriteHeader(http.StatusNotAcceptable)
+		e.statsdClient.Incr(Error, []string{backend.Host, backendId,
+			"error:cannot find upstream by path", "path:" + r.URL.EscapedPath()}, 1)
 		return
 	}
 	cbKey, err := e.buildRequestKey(backend, r)
 	if err != nil {
 		log.Warn().Msgf("failed to build proxy key," +
 			"this request will forwarded but circuit breaker will not applied, error: %v", err)
+		e.statsdClient.Incr(Error, []string{backend.Host, backendId,
+			"error:failed build request key", "path:" + r.URL.EscapedPath()}, 1)
 		forwardAndResponse(backend.Host, w, r)
 		return
 	}
@@ -55,6 +64,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 	if instance.Traffic.Check()  {
 		instance.Traffic.IncTrafficCount()
 		statusCode, respBody := forwardAndResponse(backend.Host, w, r)
+		e.statsdClient.Incr(UpstreamResponse, []string{backendId, strconv.Itoa(statusCode)}, 1)
 		e.updateStat(backendId, instance, respBody, statusCode)
 	} else {
 		fallback(w, e.config.CircuitBreaker.Fallback)
@@ -100,7 +110,7 @@ func fallback(w http.ResponseWriter, fb circuitbreaker.Fallback) {
 	return
 }
 
-func findUpstreamsByPathURL(path string, upstreamMap map[string]upstream.Upstream) (upstream.Upstream, string) {
+func findUpstreamByPathURL(path string, upstreamMap map[string]upstream.Upstream) (upstream.Upstream, string) {
 	for key, val := range upstreamMap {
 		if strings.Contains(path, key) {
 			return val, key
