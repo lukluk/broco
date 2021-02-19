@@ -62,14 +62,14 @@ circuit_breaker:
     message: {"status":"11"}
 statsd_host: http://localhost:8125
 upstreams:
-  /v1/test:
-    host: "http://localhost:3000"
+  /v1/foo:
+    host: "http://foo.com:3000"
     add_error_conditions:
       response_body:
         path: status
         value: 11
-  /v2:
-    host: "http://localhost:3000"
+  /bar:
+    host: "http://bar.com:3000"
     circuit_breaker_key:
       request_body_json_paths:
         - bank
