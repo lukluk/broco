@@ -8,9 +8,8 @@ import (
 	"time"
 )
 
-func ForwardRequest (host string, req *http.Request) (*http.Response, error) {
+func ForwardRequest (host string, req *http.Request, timeout time.Duration) (*http.Response, error) {
 	url := req.URL
-	timeout := 15 * time.Second
 	client := httpclient.NewClient(
 		httpclient.WithHTTPTimeout(timeout),
 		)

@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type entryPoint struct {
@@ -53,7 +54,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 			"this request will forwarded but circuit breaker will not applied, error: %v", err)
 		e.statsdClient.Incr(ErrorMetric, []string{backend.Host, backendId,
 			"error:failed build request key", "path:" + r.URL.EscapedPath()}, 1)
-		forwardAndResponse(backend.Host, w, r)
+		forwardAndResponse(backend.Host, w, r, backend.Timeout)
 		return
 	}
 	instance := e.circuitBreakerData.Get(cbKey)
@@ -63,7 +64,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 	}
 	if instance.Traffic.Check()  {
 		instance.Traffic.IncTrafficCount()
-		statusCode, respBody := forwardAndResponse(backend.Host, w, r)
+		statusCode, respBody := forwardAndResponse(backend.Host, w, r, backend.Timeout)
 		e.statsdClient.Incr(upstreamResponseMetric, []string{backendId, strconv.Itoa(statusCode)}, 1)
 		e.updateStat(backendId, instance, respBody, statusCode)
 	} else {
@@ -79,8 +80,8 @@ func (e *entryPoint) updateStat(backendId string, instance *scheme.Instance, res
 }
 
 
-func forwardAndResponse(host string, w http.ResponseWriter, r *http.Request) (int, []byte) {
-	resp, err := proxy.ForwardRequest(host, r)
+func forwardAndResponse(host string, w http.ResponseWriter, r *http.Request, timeout time.Duration) (int, []byte) {
+	resp, err := proxy.ForwardRequest(host, r, timeout)
 	if err != nil {
 		w.WriteHeader(http.StatusBadGateway)
 		return http.StatusBadGateway, nil

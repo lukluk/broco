@@ -12,13 +12,14 @@ circuit_breaker:
 statsd_host: http://localhost:8125
 upstreams:
   /v1/test:
-    host: "http://localhost:3000"
+    host: http://localhost:3000
+    timeout: 10s
     add_error_conditions:
       response_body:
         path: status
         value: 11
   /v2:
-    host: "http://localhost:3000"
+    host: http://localhost:3000
     circuit_breaker_key:
       request_body_json_paths:
         - bank
