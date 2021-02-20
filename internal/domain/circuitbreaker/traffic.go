@@ -6,24 +6,24 @@ import (
 
 func (c *CircuitBreaker) trafficControl() {
 	cbConf := c.config.CircuitBreaker
-	for key, data := range c.circuitBreakerData.Instances() {
+	for key, instance := range c.circuitBreakerData.Instances() {
 		timeToOpen := time.Now().Add(cbConf.Durations.ClosedDuration)
-		errRate := data.Stats.ErrorRateInPercent(data.Traffic.TrafficCount())
-		if data.Traffic.TrafficCount() > 0 && data.Traffic.IsOnFullyOpen() && errRate > cbConf.Thresholds.MaxErrorPercent {
+		errRate := instance.Stats.ErrorRateInPercent(instance.Traffic.TrafficCount())
+		if instance.Traffic.TrafficCount() > 0 && instance.Traffic.IsOnFullyOpen() && errRate > cbConf.Thresholds.MaxErrorPercent {
 			c.statsdClient.Incr(TrafficClosedMetric, []string{key}, 1)
-			data.Traffic.CloseUntil(timeToOpen)
+			instance.Traffic.CloseUntil(timeToOpen)
 		} else
-		if data.Traffic.IsOnClosed() && time.Now().After(data.Traffic.OpenTime()) {
+		if instance.Traffic.IsOnClosed() && time.Now().After(instance.Traffic.OpenTime()) {
 			c.statsdClient.Incr(TrafficHalfOpenMetric, []string{key}, 1)
-			data.Traffic.HalfOpen()
+			instance.Traffic.HalfOpen()
 		} else
-		if data.Traffic.IsOnHalfOpen() && errRate < cbConf.Thresholds.MinErrorPercent {
+		if instance.Traffic.IsOnHalfOpen() && errRate < cbConf.Thresholds.MinErrorPercent {
 			c.statsdClient.Incr(TrafficFullyOpenMetric, []string{key}, 1)
-			data.Traffic.FullyOpen()
+			instance.Traffic.FullyOpen()
 		} else
-		if data.Traffic.TrafficCount() > 0 && data.Traffic.IsOnHalfOpen() && errRate > cbConf.Thresholds.MaxErrorPercent {
+		if instance.Traffic.TrafficCount() > 0 && instance.Traffic.IsOnHalfOpen() && errRate > cbConf.Thresholds.MaxErrorPercent {
 			c.statsdClient.Incr(TrafficReturnClosedMetric, []string{key}, 1)
-			data.Traffic.CloseUntil(timeToOpen)
+			instance.Traffic.CloseUntil(timeToOpen)
 		}
 		c.circuitBreakerData.ResetStats(key)
 	}
