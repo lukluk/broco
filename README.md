@@ -35,6 +35,8 @@ http_status (default 503)
 ### Upstreams
 #### host
 upstream host
+#### timeout
+upstream http timeout (default 15s)
 #### add_error_conditions
 
 response_body : path, value
@@ -63,7 +65,8 @@ circuit_breaker:
 statsd_host: http://localhost:8125
 upstreams:
   /v1/foo:
-    host: "http://foo.com:3000"
+    host: http://foo.com:3000
+    timeout: 10s
     add_error_conditions:
       response_body:
         path: status
