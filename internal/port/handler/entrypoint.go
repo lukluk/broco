@@ -43,7 +43,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 	backend, backendId := findUpstreamByPathURL(r.URL.EscapedPath(), e.config.Upstreams)
 	if backendId == "" {
 		w.WriteHeader(http.StatusNotAcceptable)
-		e.statsdClient.Incr(Error, []string{backend.Host, backendId,
+		e.statsdClient.Incr(ErrorMetric, []string{backend.Host, backendId,
 			"error:cannot find upstream by path", "path:" + r.URL.EscapedPath()}, 1)
 		return
 	}
@@ -51,7 +51,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Warn().Msgf("failed to build proxy key," +
 			"this request will forwarded but circuit breaker will not applied, error: %v", err)
-		e.statsdClient.Incr(Error, []string{backend.Host, backendId,
+		e.statsdClient.Incr(ErrorMetric, []string{backend.Host, backendId,
 			"error:failed build request key", "path:" + r.URL.EscapedPath()}, 1)
 		forwardAndResponse(backend.Host, w, r)
 		return
@@ -64,7 +64,7 @@ func (e *entryPoint) proxy(w http.ResponseWriter, r *http.Request) {
 	if instance.Traffic.Check()  {
 		instance.Traffic.IncTrafficCount()
 		statusCode, respBody := forwardAndResponse(backend.Host, w, r)
-		e.statsdClient.Incr(UpstreamResponse, []string{backendId, strconv.Itoa(statusCode)}, 1)
+		e.statsdClient.Incr(upstreamResponseMetric, []string{backendId, strconv.Itoa(statusCode)}, 1)
 		e.updateStat(backendId, instance, respBody, statusCode)
 	} else {
 		fallback(w, e.config.CircuitBreaker.Fallback)

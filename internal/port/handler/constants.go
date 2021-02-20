@@ -1,6 +1,6 @@
 package handler
 
 const (
-	Error = "error"
-	UpstreamResponse = "response"
+	ErrorMetric            = "error"
+	upstreamResponseMetric = "response"
 )

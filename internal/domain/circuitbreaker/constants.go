@@ -1,8 +1,8 @@
 package circuitbreaker
 
 const (
-	TrafficClosed          = "cb_traffic_closed"
-	TrafficHalfOpen 	   = "cb_traffic_half_open"
-	TrafficFullyOpen 	   = "cb_traffic_fully_open"
-	TrafficReturnClosed	   = "cb_traffic_return_closed"
+	TrafficClosedMetric       = "cb_traffic_closed"
+	TrafficHalfOpenMetric     = "cb_traffic_half_open"
+	TrafficFullyOpenMetric    = "cb_traffic_fully_open"
+	TrafficReturnClosedMetric = "cb_traffic_return_closed"
 )
